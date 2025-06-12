@@ -1,0 +1,51 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>イベントスケジュール</title>
+  <style>
+    body { font-family: sans-serif; background: #f0f8ff; padding: 20px; }
+    h1 { color: #2a57c3; text-align: center; }
+    .entry {
+      background: #fff;
+      border-left: 5px solid #2a57c3;
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 6px;
+    }
+    .entry-date { font-weight: bold; color: #2a57c3; font-size: 16px; }
+    .entry-info { margin-top: 5px; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <h1>イベントスケジュール（自動反映）</h1>
+  <div id="schedule">読み込み中...</div>
+
+  <script>
+    fetch("https://script.google.com/macros/s/AKfycbzfyC6mbV3egkvaT9H-d3a0U3Jm2GhVfB3m-qgdYoXMjRUuVktqKH9fbKTp3-Iu6wz5/exec")
+      .then(res => res.json())
+      .then(data => {
+        data.sort((a, b) => new Date(a["日付"]) - new Date(b["日付"]));
+        const container = document.getElementById("schedule");
+        container.innerHTML = "";
+        data.forEach(row => {
+          const div = document.createElement("div");
+          div.className = "entry";
+          div.innerHTML = `
+            <div class="entry-date">${row["日付"]}</div>
+            <div class="entry-info">
+              担当者：${row["担当者"]}｜班名：${row["班名"]}｜場所：${row["場所"]}<br>
+              内容：${row["内容"]}｜宿泊先：${row["宿泊先"]}｜備考：${row["備考"] || ""}
+            </div>
+          `;
+          container.appendChild(div);
+        });
+      })
+      .catch(err => {
+        document.getElementById("schedule").innerHTML = "スケジュールの取得に失敗しました。";
+        console.error(err);
+      });
+  </script>
+</body>
+</html>
